@@ -9,12 +9,13 @@ def main():
     while True:
         clear()
         user_input = input(
-            '''Welcome to ExcelAssistant 1.0!
+            '''Welcome to ExcelAssistant 1.0.1!
 
             \rWould you like to:
 
-            \r1) Match values in one column to data from another spreadsheet
-            \r2) Match a value in one column to data in another
+            \r1) Match values from a source spreadsheet to values and data from another 
+            \r   spreadsheet and write the data to the source
+            \r2) Match a provided value to data in a spreadsheet
             \r0) Quit
 
             \r>>> '''
@@ -29,7 +30,6 @@ def main():
             input("Press enter to continue\n")
         elif user_input in ('0', '1', '2'):
             options[user_input]()
-            input("\nPress enter to continue\n")
 
 
 def auto_match():
@@ -47,7 +47,7 @@ def auto_match():
     except FileNotFoundError:
         print("Error: %s does not exist!" % wb_path)
         input("Press enter to continue\n")
-        quit()
+        return
 
     if header:  # Whether or not to include the top row(header)
         start_row = 2
@@ -67,6 +67,7 @@ def auto_match():
             source_value = "NotFound"
         source_sheet.cell(column=source_value_col, row=row, value="{0}".format(source_value))
     source_wb.save(source_wb_path)
+    input("Press enter to continue\n")
 
 def match():
     data_wb_path = input("Please enter the path of the excel file containing the data you want: ").strip("\" \'")
@@ -79,7 +80,7 @@ def match():
     except FileNotFoundError:
         print("Error: %s does not exist!" % wb_path)
         input("Press enter to continue\n")
-        quit()
+        return
 
     if header:  # Whether or not to include the top row(header)
         start_row = 2
@@ -88,9 +89,11 @@ def match():
 
     data_sheet = data_wb.active
     data_dict = load_data(data_sheet, data_key_col, data_value_col, start_row)
-
+    print("To return to menu, enter 'exit'")
     while True:
         source_key = input("Please enter a value to search: ")
+        if source_key.upper() == "EXIT":
+            return
         if source_key in data_dict:
             print("Found value: ", data_dict[source_key])
         else:
